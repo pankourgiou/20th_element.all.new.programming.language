@@ -1,0 +1,168 @@
+<!doctype html><html lang="el"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>20th_element</title>
+<style>
+:root{color-scheme:dark;--bg:#0a0c18;--fg:#e6e8f5;--ac:#7df3ff;--gd:#ffd86b;--pn:#151a30;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{background:var(--bg)}
+body{margin:auto;padding:10px;color:var(--fg);font-family:"Courier New",monospace;max-width:680px}
+canvas{display:block;width:100%;image-rendering:pixelated;border:3px solid var(--ac);box-sizing:border-box;background:#05060f}
+textarea{width:100%;height:190px;box-sizing:border-box;background:var(--pn);color:var(--fg);border:3px solid var(--gd);font:15px "Courier New",monospace;margin-top:8px}
+button{background:var(--ac);color:#000;border:0;padding:7px 11px;font:bold 14px "Courier New",monospace;margin:6px 6px 0 0;cursor:pointer}
+button.b2{background:#8c93b8}button.on{background:var(--gd)}
+h2{font-size:16px;color:var(--gd);margin:14px 0 4px}
+#info,#msg{margin-top:8px;line-height:1.5}#msg{min-height:22px;font-weight:bold}
+details{background:var(--pn);border:2px solid #39406a;padding:8px;margin-top:10px}
+td{padding:2px 10px 2px 0;vertical-align:top}code{color:var(--gd)}
+.hint{margin-top:8px;color:var(--gd);font-size:13px}textarea::selection{background:var(--gd);color:#000}
+</style></head><body>
+<canvas id="hero" width="640" height="90"></canvas>
+<h2>🌑 Αποστολές</h2><div id="ms"></div><div id="info"></div>
+<canvas id="c" width="480" height="380" style="margin-top:6px"></canvas>
+<h2>⌨ Κώδικας .20th_element</h2>
+<textarea id="src" spellcheck="false"></textarea>
+<div class="hint">🖱️ Σημείωσε (highlight) κώδικα και τρέχει αμέσως — μόνο ό,τι μαρκάρεις · Ctrl+A για όλο</div><button id="rs" class="b2">↺ Επαναφορά</button><button id="snd" class="b2">🔊 Ήχος</button><button id="sv" class="b2">💾 Αποθήκευση</button><button id="op" class="b2">📂 Άνοιγμα</button>
+<input type="file" id="fl" accept=".20th_element,.txt,text/plain" style="display:none">
+<div id="msg"></div>
+<canvas id="scr" width="640" height="180" style="margin-top:8px"></canvas>
+<h2>📚 Παραδείγματα</h2><div id="ex"></div>
+<details><summary><b>Βοήθεια — η γλώσσα</b></summary><table>
+<tr><td><code>print / γράψε</code></td><td>εκτυπώνει τιμή: <code>print "Hi"</code>, <code>γράψε 2+3</code></td></tr>
+<tr><td><code>let / όρισε</code></td><td>μεταβλητή: <code>let n = 5</code> · μετά: <code>n = n + 1</code></td></tr>
+<tr><td><code>repeat / επανάλαβε</code></td><td><code>repeat 3 { ... }</code></td></tr>
+<tr><td><code>if / αν … else / αλλιώς</code></td><td><code>if n % 2 == 0 { ... } else { ... }</code></td></tr>
+<tr><td><code>fn / συνάρτηση, call / κάλεσε</code></td><td><code>fn όνομα { ... }</code> · <code>call όνομα</code></td></tr>
+<tr><td><code>move / προχώρα n</code></td><td>περπατά ο αστροναύτης</td></tr>
+<tr><td><code>turn / στρίψε left|right|αριστερά|δεξιά</code></td><td>στροφή</td></tr>
+<tr><td><code>mine / σκάψε</code></td><td>σπάει βράχο μπροστά</td></tr>
+<tr><td><code>crystals / κρύσταλλα</code></td><td>πόσα κρύσταλλα Ca μάζεψες</td></tr>
+<tr><td>τελεστές</td><td><code>+ - * / % ^ &lt; &gt; == != &lt;= &gt;= ( )</code> · σχόλια: <code>#</code></td></tr>
+</table><p>Το Ca είναι το 20ό στοιχείο — ασβέστιο, που βρίσκεται στο φεγγαρόχωμα. Μάζεψε όλα τα κρύσταλλα!</p></details>
+<script>
+const FONT="A 01110 10001 11111 10001 10001|B 11110 10001 11110 10001 11110|C 01111 10000 10000 10000 01111|D 11110 10001 10001 10001 11110|E 11111 10000 11110 10000 11111|F 11111 10000 11110 10000 10000|G 01111 10000 10011 10001 01111|H 10001 10001 11111 10001 10001|I 11111 00100 00100 00100 11111|J 00111 00001 00001 10001 01110|K 10001 10010 11100 10010 10001|L 10000 10000 10000 10000 11111|M 10001 11011 10101 10001 10001|N 10001 11001 10101 10011 10001|O 01110 10001 10001 10001 01110|P 11110 10001 11110 10000 10000|Q 01110 10001 10101 10010 01101|R 11110 10001 11110 10010 10001|S 01111 10000 01110 00001 11110|T 11111 00100 00100 00100 00100|U 10001 10001 10001 10001 01110|V 10001 10001 10001 01010 00100|W 10001 10001 10101 11011 10001|X 10001 01010 00100 01010 10001|Y 10001 01010 00100 00100 00100|Z 11111 00010 00100 01000 11111|α 01110 10001 10001 10011 01101|β 11110 10001 11110 10001 11110|γ 10001 10001 01010 00100 00100|δ 01110 01000 01110 10001 01110|ε 01111 10000 01110 10000 01111|ζ 11111 00010 00100 01000 01111|η 11110 10001 10001 10001 10001|θ 01110 10001 11111 10001 01110|ι 00100 00100 00100 00100 00010|κ 10010 10100 11000 10100 10010|λ 10000 01000 00100 01010 10001|μ 10001 10001 10001 11110 10000|ν 10001 10001 10001 01010 00100|ξ 11111 10000 01110 10000 01111|ο 01110 10001 10001 10001 01110|π 11111 01010 01010 01010 01010|ρ 11110 10001 11110 10000 10000|σ 01111 10010 10001 10001 01110|τ 11111 00100 00100 00100 00010|υ 10001 10001 10001 10001 01110|φ 00100 01110 10101 01110 00100|χ 10001 01010 00100 01010 10001|ψ 10101 10101 10101 01110 00100|ω 10001 10001 10101 11011 10001|0 01110 10011 10101 11001 01110|1 00100 01100 00100 00100 01110|2 01110 10001 00110 01000 11111|3 11110 00001 01110 00001 11110|4 10010 10010 11111 00010 00010|5 11111 10000 11110 00001 11110|6 01110 10000 11110 10001 01110|7 11111 00001 00010 00100 00100|8 01110 10001 01110 10001 01110|9 01110 10001 01111 00001 01110|, 00000 00000 00000 00100 01000|. 00000 00000 00000 00000 00100|! 00100 00100 00100 00000 00100|? 01110 00001 00110 00000 00100|: 00000 00100 00000 00100 00000|- 00000 00000 11111 00000 00000|_ 00000 00000 00000 00000 11111|+ 00100 00100 11111 00100 00100|= 00000 11111 00000 11111 00000|/ 00001 00010 00100 01000 10000|( 00010 00100 00100 00100 00010|) 01000 00100 00100 00100 01000|< 00010 00100 01000 00100 00010|> 01000 00100 00010 00100 01000|^ 00100 01010 10001 00000 00000|* 00000 10101 01110 10101 00000|% 11001 11010 00100 01011 10011|# 01010 11111 01010 11111 01010|' 00100 00100 00000 00000 00000|; 00000 00100 00000 00100 01000|[ 01110 01000 01000 01000 01110|] 01110 00010 00010 00010 01110|{ 00110 00100 01100 00100 00110|} 01100 00100 00110 00100 01100|@ 01110 10111 10111 10000 01110|& 01100 10010 01101 10010 01101|~ 00000 01001 10110 00000 00000|$ 01111 10100 01110 00101 11110|² 11100 00100 11100 10000 11100|³ 11100 00100 01100 00100 11100";
+const F={};FONT.split("|").forEach(s=>{const p=s.split(" ");F[p[0]]=p.slice(1)});
+const $=i=>document.getElementById(i),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const key=c=>{c=c.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/ς/g,"σ");return/[a-z]/.test(c)?c.toUpperCase():c};
+const norm=w=>w.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/ς/g,"σ");
+const rnd=(x,y,k)=>(Math.sin(x*12.9898+y*78.233+k*37.7)*43758.5453)%1;
+const BOX=["11111","10001","10001","10001","11111"];
+function ptext(ctx,x,y,s,txt,n,col){let cnt=0;for(const ch of txt){const gl=F[key(ch)]||(ch==" "?null:BOX);if(gl)for(let r=0;r<5;r++)for(let c=0;c<5;c++)if(gl[r][c]=="1"){if(cnt<n){const hot=cnt>=n-7;if(hot){ctx.fillStyle="rgba(255,255,255,.25)";ctx.fillRect(x+c*s-1,y+r*s-1,s+1,s+1)}ctx.fillStyle=hot?"#fff":col;ctx.fillRect(x+c*s,y+r*s,s-1,s-1)}cnt++}x+=6*s}return cnt}
+let AC,MUTE=false;
+function ac(){try{if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(C)AC=new C()}if(AC&&AC.state=="suspended")AC.resume()}catch(e){}return AC}
+["pointerdown","keydown","touchstart"].forEach(ev=>addEventListener(ev,ac,{passive:true}));
+function beep(ch){if(MUTE)return;const a=ac();if(!a||a.state!="running")return;const k=key(ch);if(k==" ")return;let f,ty="square",d=.07,v=.05;
+if(/^\d$/.test(k)){f=392*Math.pow(2,(+k)*2/12);ty="triangle";d=.13;v=.09}
+else if(/\p{L}/u.test(k)){const i=k.charCodeAt(0)%15,s=[0,2,4,7,9][i%5]+12*Math.floor(i/5);f=262*Math.pow(2,s/12)}
+else{f=110+(k.charCodeAt(0)%8)*30;ty="sawtooth";d=.09;v=.04}
+const o=a.createOscillator(),gn=a.createGain(),t0=a.currentTime;o.type=ty;o.frequency.value=f;gn.gain.setValueAtTime(v,t0);gn.gain.exponentialRampToValueAtTime(.0001,t0+d);o.connect(gn);gn.connect(a.destination);o.start(t0);o.stop(t0+d+.02)}
+const glyph=ch=>F[key(ch)]||(ch==" "?null:BOX);
+function pxIdx(txt,p){let c=0;for(let k=0;k<txt.length;k++){const gl=glyph(txt[k]);if(gl){c+=gl.join("").split("1").length-1;if(p<=c)return k}}return -1}
+function snd(l,o){for(let p=o+1;p<=l.n;p++){const k=pxIdx(l.t,p);if(k>=0&&k!=l.si){l.si=k;beep(l.t[k])}}}
+// hero
+const hx=$("hero").getContext("2d");let hn=0;
+setInterval(()=>{hx.fillStyle="#05060f";hx.fillRect(0,0,640,90);const a=ptext(hx,68,8,7,"20TH_ELEMENT",hn,"#e6e8f5");ptext(hx,167,60,3,"ΣΕΛΗΝΗ - MOON BASE",hn-a,"#7df3ff");hn=(hn+14)%1000},30);
+// terminal
+const sx=$("scr").getContext("2d");let out=[];
+function scr(){sx.fillStyle="#05060f";sx.fillRect(0,0,640,180);out.slice(-7).forEach((l,i)=>ptext(sx,8,8+i*24,3,l.t,l.n,l.col))}
+setInterval(()=>{const l=out.find(l=>l.n<l.max);if(l){const o=l.n;l.n=Math.min(l.max,l.n+5);snd(l,o);if(l.n>=l.max){l.n=l.max+99;l.dt=Date.now()}scr()}},25);
+async function say(t,col){for(const p of (t.match(/.{1,34}/g)||[""])){let m=0;for(const ch of p){const gl=F[key(ch)]||(ch==" "?null:BOX);if(gl)m+=gl.join("").split("1").length-1}out.push({t:p,n:0,max:m,col:col||"#7df3ff",dt:m?0:Date.now()})}while(out.some(l=>l.n<l.max))await sleep(30)}
+// missions
+const MS=[
+{n:"Ελεύθερη",g:"Δοκίμασε ό,τι θες και μάζεψε κρύσταλλα Ca.",s:[2,4,1],m:["K..C.H..K...","............","..R....C..A.","............","...K....R...","............","C.....K.....","..........K."]},
+{n:"1 Προσεδάφιση",g:"Μάζεψε τα 3 κρύσταλλα Ca στη σειρά.",s:[0,7,1],m:["..C......C..","............","...R........","H...........",".......C....","..........A.","..C.........","...K..K..K.."]},
+{n:"2 Κρατήρες",g:"Γύρνα τους κρατήρες και μάζεψε 3 κρύσταλλα.",s:[1,6,1],m:["............",".K........K.","............",".H..CCC.....","....C.C.A...","............","..........K.","............"]},
+{n:"3 Βράχοι",g:"Σκάψε τους βράχους και φτάσε το κρύσταλλο.",s:[0,4,1],m:["C...........","..HC....C...","............","............","....RRR....K","............","...C....CA..","............"]}];
+const EX=[
+{n:"Hello",m:0,c:'print "Hello Moon!"\nprint "Γεια σου Σελήνη!"\nprint 2 + 3 * 4'},
+{n:"E=mc^2",m:0,c:'print "E=mc^2"\nlet m = 2\nlet c = 3\nprint "E=" + m * c ^ 2\nprint 2 ^ 10'},
+{n:"Μέτρημα",m:0,c:'let n = 1\nrepeat 5 {\n  print n\n  n = n + 1\n}'},
+{n:"Ελληνικά",m:0,c:'όρισε α = 3\nεπανάλαβε α {\n  γράψε "ΣΕΛΗΝΗ"\n}\nγράψε α * 7'},
+{n:"Μαθηματικά",m:0,c:'print (7 + 3) * 2\nprint 10 / 4\nprint 10 % 3\nprint "TWO TO FIVE: " + 2*2*2*2*2'},
+{n:"FizzBuzz",m:0,c:'let n = 1\nrepeat 15 {\n  if n % 15 == 0 { print "FIZZBUZZ" } else {\n    if n % 3 == 0 { print "FIZZ" } else {\n      if n % 5 == 0 { print "BUZZ" } else { print n }\n    }\n  }\n  n = n + 1\n}'},
+{n:"Συνάρτηση",m:0,c:'fn square {\n  repeat 4 {\n    move 2\n    turn right\n  }\n}\ncall square\nprint "SQUARE DONE"'},
+{n:"Αποστολή 1",m:1,c:'repeat 3 {\n  move 3\n}\nprint crystals'},
+{n:"Αποστολή 1 (ΕΛ)",m:1,c:'επανάλαβε 3 {\n  προχώρα 3\n}\nγράψε "ΤΕΛΟΣ"'},
+{n:"Συνθήκη",m:1,c:'let steps = 0\nrepeat 9 {\n  move 1\n  steps = steps + 1\n  if crystals == 3 { print "FULL" }\n}\nprint steps'},
+{n:"Αποστολή 2",m:2,c:'move 9\nturn left\nmove 5\nturn left\nmove 9\nprint "CA=" + crystals'},
+{n:"Αποστολή 3",m:3,c:'move 3\nrepeat 3 {\n  mine\n  move 1\n}\nmove 5\nprint "BINGO"'}];
+const g=$("c").getContext("2d"),T=40,DIR=[[0,-1],[1,0],[0,1],[-1,0]];
+let cur=0,S,busy=false;
+function mission(i){cur=i;$("ms").innerHTML="";MS.forEach((m,j)=>{const b=document.createElement("button");b.textContent=m.n;b.className=j==i?"on":"b2";b.onclick=()=>{if(!busy){mission(j);$("src").value=""}};$("ms").appendChild(b)});$("info").textContent="🎯 "+MS[i].g;reset()}
+function reset(){const M=MS[cur];S={x:M.s[0],y:M.s[1],d:M.s[2],m:M.m.map(r=>r.split("")),got:0};$("msg").textContent="";out=[];scr();draw()}
+function drawOld(){g.fillStyle="#05060f";g.fillRect(0,0,480,360);
+for(let k=0;k<30;k++){g.fillStyle="#fff";g.fillRect(Math.abs(rnd(k,1,3))*470,Math.abs(rnd(k,2,3))*36,2,2)}
+for(let i=0;i<6;i++)for(let j=0;j<6;j++)if((i-2.5)**2+(j-2.5)**2<7){g.fillStyle=rnd(i,j,5)>.3?"#2f6fe0":"#3fa04a";g.fillRect(420+i*5,5+j*5,5,5)}
+for(let y=0;y<8;y++)for(let x=0;x<12;x++){const X=x*T,Y=40+y*T,c=S.m[y][x];g.fillStyle="#b5b5bd";g.fillRect(X,Y,T,T);
+for(let i=0;i<5;i++)for(let j=0;j<5;j++){g.fillStyle=`rgba(0,0,0,${Math.abs(rnd(x*5+i,y*5+j,2))*.2})`;g.fillRect(X+i*8,Y+j*8,8,8)}
+if(c=="C"){g.fillStyle="#4a4a54";g.fillRect(X+4,Y+8,32,24);g.fillStyle="#33333c";g.fillRect(X+10,Y+12,20,16)}
+if(c=="R"){g.fillStyle="#8d8d96";g.fillRect(X+4,Y+8,32,28);g.fillStyle="#a9a9b2";g.fillRect(X+4,Y+8,32,6)}
+if(c=="K"){g.fillStyle="#5fbfe0";g.fillRect(X+8,Y+22,8,12);g.fillRect(X+26,Y+20,8,14);g.fillStyle="#9fe8ff";g.fillRect(X+14,Y+8,12,26);g.fillStyle="#fff";g.fillRect(X+16,Y+8,4,10)}}
+const X=S.x*T,Y=40+S.y*T,d=DIR[S.d];g.fillStyle="#9a9aa5";g.fillRect(X+6,Y+16,5,14);g.fillStyle="#fff";g.fillRect(X+10,Y+14,20,22);g.fillRect(X+9,Y+3,22,16);g.fillStyle="#e8b923";g.fillRect(X+12,Y+7,16,8);g.fillStyle="#ff7a1a";g.fillRect(X+18+d[0]*13,Y+9+d[1]*13,5,5)}
+function tileAt(x,y,c){const X=x*T,Y=60+y*T;g.fillStyle="#b5b5bd";g.fillRect(X,Y,T,T);
+for(let i=0;i<5;i++)for(let j=0;j<5;j++){g.fillStyle=`rgba(0,0,0,${Math.abs(rnd(x*5+i,y*5+j,2))*.2})`;g.fillRect(X+i*8,Y+j*8,8,8)}
+if(c=="C"){g.fillStyle="#4a4a54";g.fillRect(X+4,Y+8,32,24);g.fillStyle="#33333c";g.fillRect(X+10,Y+12,20,16)}
+if(c=="R"){g.fillStyle="#8d8d96";g.fillRect(X+4,Y+8,32,28);g.fillStyle="#a9a9b2";g.fillRect(X+4,Y+8,32,6)}
+if(c=="K"){g.fillStyle="#5fbfe0";g.fillRect(X+8,Y+22,8,12);g.fillRect(X+26,Y+20,8,14);g.fillStyle="#9fe8ff";g.fillRect(X+14,Y+8,12,26);g.fillStyle="#fff";g.fillRect(X+16,Y+8,4,10)}}
+function sprite(x,y,c){const X=x*T,Y=60+y*T;g.fillStyle="rgba(0,0,0,.25)";g.fillRect(X+3,Y+33,34,5);
+if(c=="H"){g.fillStyle="#d8d8e0";g.fillRect(X+2,Y+22,36,12);g.fillStyle="#9fd8ff";g.fillRect(X+6,Y+12,28,10);g.fillRect(X+10,Y+8,20,4);g.fillStyle="#fff";g.fillRect(X+10,Y+8,6,2);g.fillStyle="#8a8a96";g.fillRect(X+19,Y,2,8);g.fillStyle="#ff4040";g.fillRect(X+18,Y-3,4,3);g.fillStyle="#ffd86b";g.fillRect(X+8,Y+14,5,5);g.fillRect(X+27,Y+14,5,5);g.fillStyle="#444";g.fillRect(X+16,Y+25,8,9)}
+if(c=="A"){g.fillStyle="#f2f2f5";g.fillRect(X+12,Y-14,16,46);g.fillStyle="#c8c8d0";g.fillRect(X+24,Y-14,4,46);g.fillStyle="#d92b2b";g.fillRect(X+14,Y-24,12,10);g.fillRect(X+17,Y-29,6,5);g.fillRect(X+12,Y+8,16,4);g.fillRect(X+3,Y+20,9,14);g.fillRect(X+28,Y+20,9,14);g.fillStyle="#333";g.fillRect(X+15,Y-6,10,10);g.fillStyle="#5fbfe0";g.fillRect(X+17,Y-4,6,6);g.fillStyle="#444";g.fillRect(X+8,Y+32,4,5);g.fillRect(X+28,Y+32,4,5)}}
+function astro(){const X=S.x*T,Y=60+S.y*T,d=DIR[S.d];g.fillStyle="#9a9aa5";g.fillRect(X+6,Y+16,5,14);g.fillStyle="#cfcfd8";g.fillRect(X+12,Y+34,6,5);g.fillRect(X+22,Y+34,6,5);g.fillStyle="#fff";g.fillRect(X+10,Y+14,20,22);g.fillRect(X+9,Y+3,22,16);g.fillStyle="#e8b923";g.fillRect(X+12,Y+7,16,8);g.fillStyle="#ff7a1a";g.fillRect(X+18+d[0]*13,Y+9+d[1]*13,5,5)}
+function banner(){const L=out.filter(l=>!l.dt||Date.now()-l.dt<6000).slice(-2);if(!L.length)return;const w=Math.max(...L.map(l=>l.t.length))*12,h=L.length*14;let x=Math.max(8,Math.min(472-w,S.x*T+20-w/2)),y=60+S.y*T-h-10;if(y<66)y=60+S.y*T+T+8;
+g.fillStyle="rgba(5,10,30,.9)";g.fillRect(x-5,y-5,w+8,h+6);g.strokeStyle="#7df3ff";g.strokeRect(x-4.5,y-4.5,w+7,h+5);L.forEach((l,i)=>ptext(g,x,y+i*14,2,l.t,l.n,l.col))}
+function draw(){g.fillStyle="#05060f";g.fillRect(0,0,480,380);
+for(let k=0;k<40;k++){g.fillStyle="#fff";g.fillRect(Math.abs(rnd(k,1,3))*470,Math.abs(rnd(k,2,3))*40,2,2)}
+for(let i=0;i<6;i++)for(let j=0;j<6;j++)if((i-2.5)**2+(j-2.5)**2<7){g.fillStyle=rnd(i,j,5)>.3?"#2f6fe0":"#3fa04a";g.fillRect(420+i*5,6+j*5,5,5)}
+for(let k=0;k<24;k++){const h=10+Math.abs(rnd(k,7,1))*26;g.fillStyle="#2a2d3f";g.fillRect(k*20,60-h,20,h);g.fillStyle="#3b3f57";g.fillRect(k*20,60-h,20,4)}
+for(let y=0;y<8;y++){for(let x=0;x<12;x++)tileAt(x,y,S.m[y][x]);for(let x=0;x<12;x++){const c=S.m[y][x];if(c=="H"||c=="A")sprite(x,y,c)}if(S.y==y)astro()}banner()}
+function mv(s){const d=DIR[S.d],nx=S.x+d[0],ny=S.y+d[1];if(nx<0||ny<0||nx>11||ny>7)throw"Ο αστροναύτης βγήκε από τον χάρτη!";const c=S.m[ny][nx];
+if(s=="mine"){if(c!="R")throw"Δεν υπάρχει βράχος μπροστά!";S.m[ny][nx]="."}
+else{if(c=="C")throw"Κρατήρας! Δεν περνιέται.";if(c=="H"||c=="A")throw"Εμπόδιο! Βάση ή πύραυλος μπροστά.";if(c=="R")throw"Βράχος! Χρησιμοποίησε mine / σκάψε.";S.x=nx;S.y=ny;if(c=="K"){S.m[ny][nx]=".";S.got++}}draw()}
+// language
+const KW={print:"print",γραψε:"print",εκτυπωσε:"print",repeat:"repeat",επαναλαβε:"repeat",let:"let",ορισε:"let",if:"if",αν:"if",else:"else",αλλιως:"else",move:"move",προχωρα:"move",μπροστα:"move",turn:"turn",στριψε:"turn",left:"left",αριστερα:"left",right:"right",δεξια:"right",mine:"mine",σκαψε:"mine",fn:"fn",συναρτηση:"fn",call:"call",καλεσε:"call"};
+const OPS={"+":(x,y)=>x+y,"-":(x,y)=>x-y,"*":(x,y)=>x*y,"/":(x,y)=>x/y,"%":(x,y)=>x%y,"^":(x,y)=>Math.pow(x,y),"<":(x,y)=>x<y,">":(x,y)=>x>y,"==":(x,y)=>x==y,"!=":(x,y)=>x!=y,"<=":(x,y)=>x<=y,">=":(x,y)=>x>=y};
+let t,i,fns,V,ops;const peek=()=>t[i],nx=()=>t[i++],isId=w=>/^[\p{L}_]/u.test(w||"");
+const bin=(lv,next)=>()=>{let a=next();while(lv.includes(peek())){const o=nx();a=[o,a,next()]}return a};
+function pri(){const w=nx();if(w===undefined)throw"λείπει τιμή";if(w=="("){const e=expr();if(nx()!=")")throw"λείπει )";return e}if(w[0]=='"')return["s",w.slice(1,-1)];if(/^\d/.test(w))return["n",+w];if(w=="-")return["-",["n",0],pri()];if(isId(w))return["v",norm(w)];throw"απρόσμενο: "+w}
+const pw=bin(["^"],pri),mul=bin(["*","/","%"],pw),add=bin(["+","-"],mul),expr=bin(["<",">","==","!=","<=",">="],add);
+function block(){if(nx()!="{")throw"λείπει {";const o=[];while(peek()!="}"){if(peek()===undefined)throw"λείπει }";o.push(st())}nx();return o}
+function st(){const w=nx(),k=KW[norm(w)];
+if(k=="print")return["print",expr()];
+if(k=="repeat"){const n=expr();return["repeat",n,block()]}
+if(k=="let"){const v=norm(nx()||"");if(nx()!="=")throw"λείπει =";return["set",v,expr()]}
+if(k=="if"){const c=expr(),b=block();let e=[];if(KW[norm(peek()||"")]=="else"){nx();e=block()}return["if",c,b,e]}
+if(k=="move")return["move",expr()];
+if(k=="turn"){const d=KW[norm(nx()||"")];if(d!="left"&&d!="right")throw"στρίψε left/right (αριστερά/δεξιά)";return["turn",d]}
+if(k=="mine")return["mine"];
+if(k=="fn"){const n=norm(nx()||"");fns[n]=block();return["nop"]}
+if(k=="call")return["call",norm(nx()||"")];
+if(isId(w)&&peek()=="="){nx();return["set",norm(w),expr()]}
+throw"άγνωστη λέξη: "+w}
+function ev(e){const[o,a,b]=e;if(o=="s"||o=="n")return a;if(o=="v"){if(a in V)return V[a];if(a=="crystals"||a=="κρυσταλλα")return S.got;throw"άγνωστη μεταβλητή: "+a}return OPS[o](ev(a),ev(b))}
+async function exec(list){for(const s of list){if(++ops>3000)throw"Πάρα πολλά βήματα (άπειρος βρόχος;)";const k=s[0];
+if(k=="print")await say(String(ev(s[1])));
+else if(k=="set")V[s[1]]=ev(s[2]);
+else if(k=="repeat"){const n=ev(s[1]);for(let j=0;j<n;j++)await exec(s[2])}
+else if(k=="if")await exec(ev(s[1])?s[2]:s[3]);
+else if(k=="call"){if(!fns[s[1]])throw"άγνωστη συνάρτηση: "+s[1];await exec(fns[s[1]])}
+else if(k=="turn"){await sleep(250);S.d=(S.d+(s[1]=="left"?3:1))%4;draw()}
+else if(k=="move"){const n=ev(s[1]);for(let j=0;j<n;j++){await sleep(220);mv("f")}}
+else if(k=="mine"){await sleep(250);mv("mine")}}}
+async function runCode(code){if(busy)return;reset();const m=$("msg");m.style.color="#ff9c8a";fns={};V={};ops=0;let prog=[];
+try{t=code.replace(/(\/\/|#).*$/gm,"").match(/"[^"]*"|\d+(\.\d+)?|[\p{L}_][\p{L}\p{N}_]*|==|!=|<=|>=|[{}()+\-*\/%^<>=]/gu)||[];i=0;while(i<t.length)prog.push(st())}catch(e){m.textContent="⚠ "+e;return}
+busy=true;try{await exec(prog);
+if(!S.m.some(r=>r.includes("K"))){m.style.color="#7df3ff";m.textContent="🎉 Όλα τα κρύσταλλα Ca μαζεύτηκαν!";await say("MISSION COMPLETE!","#ffd86b")}
+else{m.style.color="#ffd86b";m.textContent="Απομένουν κρύσταλλα Ca — δοκίμασε ξανά."}}
+catch(e){m.textContent="⚠ "+e;await say("ERROR","#ff9c8a")}busy=false}
+$("rs").onclick=()=>{if(!busy)reset()};
+$("ex").innerHTML="";EX.forEach(e=>{const b=document.createElement("button");b.className="b2";b.textContent=e.n;b.onclick=()=>{if(busy)return;mission(e.m);$("src").value=e.c;window.scrollTo({top:0,behavior:"smooth"})};$("ex").appendChild(b)});
+$("sv").onclick=async()=>{const name="πρόγραμμα.20th_element.txt",data=new Blob([$("src").value],{type:"text/plain"});
+try{const d=await claude.use("downloads");if(d){await d.save({filename:name,data});return}}catch(e){if(e&&e.code=="declined")return}
+const a=document.createElement("a");a.href=URL.createObjectURL(data);a.download=name;a.click()};
+$("op").onclick=()=>$("fl").click();
+$("fl").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{$("src").value=r.result;$("msg").style.color="#7df3ff";$("msg").textContent="📂 "+f.name};r.readAsText(f);e.target.value=""};
+const SRC=document.getElementById("src");let lastKey="",pend;
+const selTxt=()=>{const a=SRC.selectionStart,b=SRC.selectionEnd;return b>a?SRC.value.slice(a,b):""};
+function sched(){clearTimeout(pend);pend=setTimeout(chk,450)}
+function chk(){const s=selTxt();if(!s.trim()){lastKey="";return}if(busy){sched();return}const k=SRC.selectionStart+":"+SRC.selectionEnd+":"+s;if(k==lastKey)return;lastKey=k;runCode(s)}
+document.addEventListener("selectionchange",()=>{if(document.activeElement===SRC)sched()});
+["pointerup","keyup"].forEach(e=>SRC.addEventListener(e,sched));
+document.getElementById("snd").onclick=()=>{MUTE=!MUTE;document.getElementById("snd").textContent=MUTE?"🔇 Ήχος":"🔊 Ήχος";ac()};
+mission(0);$("src").value=EX[1].c;setInterval(draw,70);
+</script></body></html>
